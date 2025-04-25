@@ -1,0 +1,69 @@
+import { useState } from "react";
+
+
+export default function StudentManager() {
+  const [students, setStudents] = useState([
+    { name: "Nguyễn Văn A", age: 20, email: "a@example.com" },
+    { name: "Trần Thị B", age: 21, email: "b@example.com" },
+    { name: "Lê Văn C", age: 22, email: "c@example.com" }
+  ]);
+  const [name, setName] = useState("");
+  const [editingIndex, setEditingIndex] = useState(null);
+
+  const handleAddOrEdit = () => {
+    if (name.trim() === "") return;
+    if (editingIndex !== null) {
+      const updated = [...students];
+      updated[editingIndex].name = name;
+      setStudents(updated);
+      setEditingIndex(null);
+    } else {
+      setStudents([...students, { name, age: 0, email: "" }]);
+    }
+    setName("");
+  };
+
+  const handleDelete = (index) => {
+    const updated = students.filter((_, i) => i !== index);
+    setStudents(updated);
+  };
+
+  const handleEdit = (index) => {
+    setName(students[index].name);
+    setEditingIndex(index);
+  };
+
+  return (
+    <div className="max-w-xl mx-auto mt-10 p-4 space-y-4">
+      <h1 className="text-2xl font-bold text-center">Quản lý học viên</h1>
+      <div className="flex gap-2">
+        <Input
+          placeholder="Nhập tên học viên"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <Button onClick={handleAddOrEdit}>
+          {editingIndex !== null ? "Cập nhật" : "Thêm"}
+        </Button>
+      </div>
+
+      <div className="space-y-2">
+        {students.map((student, index) => (
+          <Card key={index} className="flex justify-between items-center p-2">
+            <CardContent className="p-0 font-medium">
+              {student.name} - {student.age} tuổi - {student.email}
+            </CardContent>
+            <div className="flex gap-2">
+              <Button size="sm" onClick={() => handleEdit(index)}>
+                Sửa
+              </Button>
+              <Button size="sm" variant="destructive" onClick={() => handleDelete(index)}>
+                Xóa
+              </Button>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
