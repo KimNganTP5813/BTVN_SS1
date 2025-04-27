@@ -1,69 +1,131 @@
 import { useState } from "react";
 
 
-export default function StudentManager() {
+export default function StudentList() {
   const [students, setStudents] = useState([
-    { name: "Nguyễn Văn A", age: 20, email: "a@example.com" },
-    { name: "Trần Thị B", age: 21, email: "b@example.com" },
-    { name: "Lê Văn C", age: 22, email: "c@example.com" }
+    { id: 1, name: "Nguyễn Văn A", age: 20, email: "a@example.com" },
+    { id: 2, name: "Trần Thị B", age: 22, email: "b@example.com" },
+    { id: 3, name: "Lê Văn C", age: 19, email: "c@example.com" },
+    { id: 4, name: "Phạm Thị D", age: 21, email: "d@example.com" },
+    { id: 5, name: "Hoàng Văn E", age: 23, email: "e@example.com" },
   ]);
-  const [name, setName] = useState("");
-  const [editingIndex, setEditingIndex] = useState(null);
 
-  const handleAddOrEdit = () => {
-    if (name.trim() === "") return;
-    if (editingIndex !== null) {
-      const updated = [...students];
-      updated[editingIndex].name = name;
-      setStudents(updated);
-      setEditingIndex(null);
+  const [newStudent, setNewStudent] = useState({
+    name: "",
+    age: "",
+    email: "",
+  });
+
+  const [editingId, setEditingId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewStudent({ ...newStudent, [name]: value });
+  };
+
+//Hàm tạo mới học viên
+  const handleAddOrUpdateStudent = () => {
+    if (newStudent.name && newStudent.age && newStudent.email) {
+      if (editingId === null) {
+        const newId = students.length ? students[students.length - 1].id + 1 : 1;
+        setStudents([
+          ...students,
+          { id: newId, ...newStudent, age: parseInt(newStudent.age) },
+        ]);
+      } else {
+        const updatedStudents = students.map((student) =>
+          student.id === editingId
+            ? { ...student, ...newStudent, age: parseInt(newStudent.age) }
+            : student
+        );
+        setStudents(updatedStudents);
+        setEditingId(null);
+      }
+      setNewStudent({ name: "", age: "", email: "" });
     } else {
-      setStudents([...students, { name, age: 0, email: "" }]);
+      alert("Vui lòng nhập đầy đủ thông tin!");
     }
-    setName("");
   };
 
-  const handleDelete = (index) => {
-    const updated = students.filter((_, i) => i !== index);
-    setStudents(updated);
+//Hàm xóa học viên
+  const handleDeleteStudent = (id) => {
+    const updatedStudents = students.filter((student) => student.id !== id);
+    setStudents(updatedStudents);
+    if (editingId === id) {
+      setEditingId(null);
+      setNewStudent({ name: "", age: "", email: "" });
+    }
   };
 
-  const handleEdit = (index) => {
-    setName(students[index].name);
-    setEditingIndex(index);
+//Hàm cập nhật lại id và thông tin học viên
+  const handleEditStudent = (student) => {
+    setEditingId(student.id);
+    setNewStudent({ name: student.name, age: student.age, email: student.email });
   };
+
+//Hàm tìm kiếm theo tên học viên
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Danh sách học viên sau khi lọc
+  const filteredStudents = students.filter((student) =>
+    student.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-4 space-y-4">
-      <h1 className="text-2xl font-bold text-center">Quản lý học viên</h1>
-      <div className="flex gap-2">
-        <Input
-          placeholder="Nhập tên học viên"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <Button onClick={handleAddOrEdit}>
-          {editingIndex !== null ? "Cập nhật" : "Thêm"}
-        </Button>
-      </div>
+    <div>
+      <h2>Danh sách học viên</h2>
 
-      <div className="space-y-2">
-        {students.map((student, index) => (
-          <Card key={index} className="flex justify-between items-center p-2">
-            <CardContent className="p-0 font-medium">
-              {student.name} - {student.age} tuổi - {student.email}
-            </CardContent>
-            <div className="flex gap-2">
-              <Button size="sm" onClick={() => handleEdit(index)}>
-                Sửa
-              </Button>
-              <Button size="sm" variant="destructive" onClick={() => handleDelete(index)}>
-                Xóa
-              </Button>
-            </div>
-          </Card>
+      <input
+        type="text"
+        placeholder="Tìm kiếm học viên theo tên..."
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ marginBottom: '10px' }}
+      />
+
+      <ul>
+        {filteredStudents.map((student) => (
+          <li key={student.id}>
+            {student.name} - {student.age} tuổi - {student.email}
+            <button onClick={() => handleEditStudent(student)} style={{ marginLeft: '10px' }}>
+              Sửa
+            </button>
+            <button onClick={() => handleDeleteStudent(student.id)} style={{ marginLeft: '10px' }}>
+              Xoá
+            </button>
+          </li>
         ))}
-      </div>
+        {filteredStudents.length === 0 && <li>Không tìm thấy học viên nào!</li>}
+      </ul>
+
+      <h3>{editingId ? "Cập nhật học viên" : "Thêm học viên mới"}</h3>
+      <input
+        type="text"
+        name="name"
+        placeholder="Tên"
+        value={newStudent.name}
+        onChange={handleChange}
+      />
+      <input
+        type="number"
+        name="age"
+        placeholder="Tuổi"
+        value={newStudent.age}
+        onChange={handleChange}
+      />
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={newStudent.email}
+        onChange={handleChange}
+      />
+      <button onClick={handleAddOrUpdateStudent}>
+        {editingId ? "Cập nhật" : "Thêm học viên"}
+      </button>
     </div>
   );
 }
