@@ -3,11 +3,21 @@ import { useState } from "react";
 
 export default function StudentList() {
   const [students, setStudents] = useState([
-    { id: 1, name: "Nguyễn Văn A", age: 20, email: "a@example.com" },
-    { id: 2, name: "Trần Thị B", age: 22, email: "b@example.com" },
-    { id: 3, name: "Lê Văn C", age: 19, email: "c@example.com" },
-    { id: 4, name: "Phạm Thị D", age: 21, email: "d@example.com" },
-    { id: 5, name: "Hoàng Văn E", age: 23, email: "e@example.com" },
+    { id: 1, 
+     name: "Nguyễn Văn A", 
+     age: 20, 
+     email: "a@example.com" 
+    },
+    { id: 2,
+     name: "Trần Thị B",
+     age: 22,
+     email: "b@example.com" 
+    },
+    { id: 3,
+     name: "Lê Văn C", 
+     age: 19, 
+     email: "c@example.com"
+    },
   ]);
 
   const [newStudent, setNewStudent] = useState({
